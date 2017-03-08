@@ -12,13 +12,21 @@ class Foo does UR6::Object {
 }
 
 subtest 'create' => {
-    plan 2;
+    plan 6;
 
     UR6::Context.branch(UR6::Context::Transaction);
 
     my $obj = Foo.create(param1 => 1, params2 => 'two');
-    ok($obj, 'Created object');
-    ok($obj.__id, 'object has __id');
+    ok $obj, 'Created object';
+    ok $obj.__id, 'object has __id';
+
+    my @objects = Foo.get();
+    is @objects.elems, 1, 'get() with no params returns the one created object';
+    ok @objects[0] === $obj, 'It is the same object we just created';
+
+    my $o2 = Foo.get($obj.__id);
+    ok $o2, 'get() an object by __id';
+    ok $obj === $o2, 'was the same object';
 }
 
 # vim: set syntax=perl6
