@@ -16,5 +16,9 @@ role UR6::Object {
     multi method get(%args) {
         UR6::Context.current.fetch(self.WHAT, %args);
     }
+
+    method delete() {
+        UR6::Context.current.delete-entity(self.WHAT, self.__id);
+    }
 }
         

@@ -24,4 +24,8 @@ method create-entity(Any:U $type, %params) {
     my $obj = $type.new(|%params);
     $!object-cache.store($obj);
 }
+
+method delete-entity(Any:U $type, $id) {
+    return $!object-cache.remove($type, $id);
+}
         

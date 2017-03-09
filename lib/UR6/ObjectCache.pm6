@@ -17,6 +17,10 @@ multi method fetch(Any:U $type, %filter) {
     return %cache{$type.^name}.values.grep({ object_matches_filter($_, %filter) });
 }
 
+method remove(Any:U $type, $id) {
+    return %cache{$type.^name}{$id}:delete;
+}
+
 
 sub object_matches_filter($obj, %filter) returns Bool {
     for %filter.keys -> $key {
