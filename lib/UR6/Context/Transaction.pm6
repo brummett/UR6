@@ -17,7 +17,7 @@ multi method fetch(Any:U $type, %filters) {
     return $!object-cache.fetch($type, %filters);
 }
 
-method create-entity(Any:U $type, %params) {
+method create-entity(Any:U $type, *%params) {
     unless %params<__id>:exists {
         %params<__id> = self.generate-object-id;
     }

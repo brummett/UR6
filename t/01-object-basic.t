@@ -4,7 +4,7 @@ use UR6::Context;
 use UR6::Context::Transaction;
 use Test;
 
-plan 1;
+plan 2;
 
 class Foo does UR6::Object {
     has Int $.param1;
@@ -33,6 +33,38 @@ subtest 'create/get/delete' => {
     @objects = Foo.get();
     is @objects.elems, 0, 'get() returned 0 objects';
     ok ! Foo.get($obj-id), 'get by-id returns nothing';
+}
+
+subtest 'get with simple filters' => {
+    plan 15;
+
+    ok my $o1 = Foo.create(param1 => 1, param2 => 'two'),  'create';
+    ok my $o2 = Foo.create(param1 => 1, param2 => 'foo'),  'create';
+    ok my $o3 = Foo.create(param1 => 10, param2 => 'bar'), 'create';
+    ok my $o4 = Foo.create(param1 => 20, param2 => 'bar'), 'create';
+
+    my @results = Foo.get(param1 => 10);
+    is @results.elems, 1, 'get() with a filter matches 1 object';
+    ok @results[0] === $o3, 'got the right object';
+
+    @results = Foo.get(param2 => 'foo');
+    is @results.elems, 1, 'get() with 1 other filter matches 1 object';
+    ok @results[0] === $o2, 'got the right other object';
+
+    @results = Foo.get(param1 => 1);
+    is @results.elems, 2, 'filter matches 2 objects';
+    ok @results>>.__id.contains(all($o1.__id, $o2.__id)), 'Got both objects back';
+
+    @results = Foo.get(param2 => 'bar');
+    is @results.elems, 2, 'filter on other property matches 2 objects';
+    ok @results>>.__id.contains(all($o3.__id, $o4.__id)), 'Got both objects back';
+
+    @results = Foo.get(param1 => 99);
+    is @results.elems, 0, 'filter matching nothing returns 0 objects';
+
+    @results = Foo.get(param1 => 1, param2 => 'foo');
+    is @results.elems, 1, 'get() with two filters matched 1 object';
+    ok @results[0] === $o2, 'got the right object back';
 }
 
 # vim: set syntax=perl6
