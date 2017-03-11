@@ -7,13 +7,7 @@ method store($obj) {
     %cache{$type}{$obj.__id} = $obj;
 }
 
-multi method fetch(Any:U $type) {
-    return %cache{$type.^name}.values;
-}
-multi method fetch(Any:U $type, $id) {
-    return %cache{$type.^name}{$id};
-}
-multi method fetch(Any:U $type, %filter) {
+method fetch(Any:U $type, %filter) {
     return %cache{$type.^name}.values.grep: { object_matches_filter($_, %filter) };
 }
 

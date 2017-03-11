@@ -7,13 +7,7 @@ role UR6::Object {
         UR6::Context.current.create-entity(self.WHAT, |%args);
     }
 
-    multi method get(Any:U:) {
-        UR6::Context.current.fetch(self.WHAT);
-    }
-    multi method get(Any:U: $id) {
-        UR6::Context.current.fetch(self.WHAT, $id);
-    }
-    multi method get(Any:U: *%args where { %args.keys }) {
+    method get(Any:U: *%args) {
         UR6::Context.current.fetch(self.WHAT, %args);
     }
 

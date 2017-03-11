@@ -25,14 +25,14 @@ subtest 'create/get/delete' => {
     is @objects.elems, 1, 'get() with no params returns the one created object';
     ok @objects[0] === $obj, 'It is the same object we just created';
 
-    my $o2 = Foo.get($obj-id);
-    ok $o2, 'get() an object by __id';
-    ok $obj === $o2, 'was the same object';
+    @objects = Foo.get(__id => $obj-id);
+    is @objects.elems, 1, 'Get 1 object by __id';
+    ok @objects[0] === $obj, 'was the same object';
 
     ok $obj.delete(), 'delete object';
     @objects = Foo.get();
     is @objects.elems, 0, 'get() returned 0 objects';
-    ok ! Foo.get($obj-id), 'get by-id returns nothing';
+    ok ! Foo.get(__id => $obj-id), 'get by-id returns nothing';
 }
 
 subtest 'get with simple filters' => {
