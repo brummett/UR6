@@ -7,7 +7,7 @@ method store($obj) {
     %cache{$type}{$obj.__id} = $obj;
 }
 
-method fetch(Any:U $type, %filter) {
+method fetch(Any:U $type, %filter --> Iterable) {
     return %cache{$type.^name}.values.grep: { object_matches_filter($_, %filter) };
 }
 

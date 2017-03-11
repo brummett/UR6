@@ -1,5 +1,7 @@
 unit class UR6::Context;
 
+role UR6::Object { ... };
+
 has UR6::Context $.parent;
 
 my UR6::Context $current-context;
@@ -9,9 +11,9 @@ method initialize(UR6::Context $initial-context) {
 }
 method current() returns UR6::Context { $current-context }
 
-method fetch(Any:U, Hash) { ... }
+method fetch(Any:U, Hash --> Iterable) { ... }
 method store(Array) { ... }
-method create-entity(Any:U, Hash) { ... }
+method create-entity(Any:U, Hash --> UR6::Object) { ... }
 method delete-entity(Any) { ... }
 
 method branch(UR6::Context:U: UR6::Context:U $kind) {
