@@ -1,5 +1,5 @@
 use UR6::Context;
-use UR6::Entity;
+need UR6::Entity;
 
 unit class UR6::Context::Root is UR6::Context;
 

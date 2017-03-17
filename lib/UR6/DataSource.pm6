@@ -1,3 +1,3 @@
-unit class UR6::DataSource;
+unit role UR6::DataSource;
 
 
