@@ -5,10 +5,9 @@ use UR6::ObjectCache;
 unit class UR6::Context::Transaction is UR6::Context;
 
 #has UR6::Change @change_list;
-has UR6::ObjectCache $!object-cache = UR6::ObjectCache.new();
 
 method fetch(Any:U $type, %filters --> Iterable) {
-    return $!object-cache.fetch($type, %filters);
+    return self.object-cache.fetch($type, %filters);
 }
 
 method create-entity(Any:U $type, *%params --> UR6::Object) {
@@ -16,10 +15,10 @@ method create-entity(Any:U $type, *%params --> UR6::Object) {
         %params<__id> = self.generate-object-id;
     }
     my $obj = $type.new(|%params);
-    $!object-cache.store($obj);
+    self.object-cache.store($obj);
 }
 
 method delete-entity(Any:U $type, $id) {
-    return $!object-cache.remove($type, $id);
+    return self.object-cache.remove($type, $id);
 }
         
