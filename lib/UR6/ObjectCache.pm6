@@ -8,7 +8,7 @@ method store($obj) {
 }
 
 method fetch(Any:U $type, %filter --> Iterable) {
-    return %cache{$type.^name}.values.grep: { object_matches_filter($_, %filter) };
+    return %cache{$type.^name}.values.grep({ object_matches_filter($_, %filter) }).sort({ $^a.__id cmp $^b.__id});
 }
 
 method remove(Any:U $type, $id) {

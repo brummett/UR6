@@ -36,12 +36,12 @@ subtest 'create/get/delete' => {
 }
 
 subtest 'get with simple filters' => {
-    plan 15;
+    plan 18;
 
-    ok my $o1 = Foo.create(param1 => 1, param2 => 'two'),  'create';
-    ok my $o2 = Foo.create(param1 => 1, param2 => 'foo'),  'create';
-    ok my $o3 = Foo.create(param1 => 10, param2 => 'bar'), 'create';
-    ok my $o4 = Foo.create(param1 => 20, param2 => 'bar'), 'create';
+    ok my $o1 = Foo.create(__id => 'a', param1 => 1, param2 => 'two'),  'create';
+    ok my $o2 = Foo.create(__id => 'b', param1 => 1, param2 => 'foo'),  'create';
+    ok my $o3 = Foo.create(__id => 'c', param1 => 10, param2 => 'bar'), 'create';
+    ok my $o4 = Foo.create(__id => 'd', param1 => 20, param2 => 'bar'), 'create';
 
     my @results = Foo.get(param1 => 10);
     is @results.elems, 1, 'get() with a filter matches 1 object';
@@ -65,6 +65,11 @@ subtest 'get with simple filters' => {
     @results = Foo.get(param1 => 1, param2 => 'foo');
     is @results.elems, 1, 'get() with two filters matched 1 object';
     ok @results[0] === $o2, 'got the right object back';
+
+    @results = Foo.get(param1 => 1)
+    is @results.elems, 2, 'get(param1 => 1) returned 2 objects';
+    ok @results[0] == $o1, 'First object is o1';
+    ok @results[1] == $o2, 'First object is o2';
 }
 
 # vim: set syntax=perl6
