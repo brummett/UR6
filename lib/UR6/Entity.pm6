@@ -1,5 +1,5 @@
 use UR6::Context;
-use UR6::Object;
+need UR6::Object;
 use UR6::DataSource;
 
 role UR6::Entity does UR6::Object { }
@@ -26,7 +26,7 @@ multi sub trait_mod:<is>(Mu:U $class, Str :$table-name!) is export {
 }
 
 class UR6::Entity::ClassHOW
-    is Metamodel::ClassHOW
+    is UR6::Object::ClassHOW
 {
     method compose(Mu $class) {
         unless $class.HOW ~~ HasDataSource {
