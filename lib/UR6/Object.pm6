@@ -33,7 +33,21 @@ class UR6::Object::ClassHOW
         @id-attribs;
     }
 
-    method object-sorter(--> Callable) { ... }
+    method id-attribute-names(--> Iterable) {
+        self.id-attributes>>.name.map({ ($_ ~~ /<[@$%]>'!'(\w+)/)[0] });
+    }
+
+    method object-sorter(--> Callable) {
+        my @id-attribute-names = self.id-attribute-names;
+        return -> UR6::Object $a, UR6::Object $b {
+            my $comparison = Order::Same;
+            for @id-attribute-names -> $name {
+                $comparison = $a."$name"() cmp $b."$name"();
+                last if $comparison != Order::Same
+            }
+            $comparison;
+        };
+    }
 }
 
 my module EXPORTHOW { }
