@@ -25,16 +25,16 @@ class UR6::Object::ClassHOW
     is Metamodel::ClassHOW
 {
     # I'd like to say "--> Array[Attribute]", but it complains :(
-    method id-attributes(--> Iterable) {
+    method id-attributes(Bool :$explicit = False --> Iterable) {
         my @id-attribs = self.attributes(self).grep({ $_ ~~ IsIdAttribute});
-        unless @id-attribs.elems {
+        unless $explicit or @id-attribs.elems {
             @id-attribs = self.attributes(self).grep({ .name eq '$!__id'});
         }
         @id-attribs;
     }
 
-    method id-attribute-names(--> Iterable) {
-        self.id-attributes>>.name.map({ ($_ ~~ /<[@$%]>'!'(\w+)/)[0] });
+    method id-attribute-names(Bool :$explicit = False --> Iterable) {
+        self.id-attributes(:$explicit)>>.name.map({ ($_ ~~ /<[@$%]>'!'(\w+)/)[0].Str });
     }
 
     method object-sorter(--> Callable) {

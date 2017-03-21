@@ -4,7 +4,7 @@ use Test;
 plan 3;
 
 subtest 'implied ID attribute' => {
-    plan 3;
+    plan 5;
     use UR6::Object;
 
     my class ImpliedId does UR6::Object {
@@ -17,6 +17,9 @@ subtest 'implied ID attribute' => {
     my @id-attribs = $class-obj.id-attributes;
     is @id-attribs.elems, 1, 'has 1 ID attribute';
     is @id-attribs[0].name, '$!__id', 'is the implied $!__id attribute';
+
+    is $class-obj.id-attributes(:explicit).elems, 0, 'Class has no explicit ID attributes';
+    is $class-obj.id-attribute-names(:explicit).elems, 0, 'Class has no explicit ID attribute names';
 }
 
 subtest 'explicit ID attributes' => {
@@ -72,7 +75,7 @@ subtest 'object-sorter' => {
     }
     $o1 = Ints.new(a => 1);
     $o2 = Ints.new(a => 2);
-    $o3 = Ints.new(a => 01);
+    $o3 = Ints.new(a => 1);
 
     $sorter = Ints.HOW.object-sorter();
     is $sorter($o1, $o2), Order::Less, '1 sorts less than 2';
