@@ -9,7 +9,32 @@ role UR6::Object {
     has $.__id;
 
     method create(Any:U: *%args --> UR6::Object) {
-        UR6::Context.current.create-entity(self.WHAT, |%args);
+        my %normalized-args = self.normalize-id-attributes-for-create(%args);
+        UR6::Context.current.create-entity(self.WHAT, |%normalized-args);
+    }
+
+    method normalize-id-attributes-for-create(%args --> Hash) {
+        my $type-obj = self.HOW;
+
+        my @id-attrib-names = $type-obj.id-attribute-names(:explicit);
+        if %args<__id> and any(%args{@id-attrib-names}:exists) {
+            die "Cannot provide both __id and explicit ID attributes to create()";
+
+        } elsif %args<__id>:!exists and @id-attrib-names.elems > 1 and none(%args{@id-attrib-names}:exists) {
+            die "Cannot autogenerate __id for a class with multiple ID attributes";
+
+        } elsif %args<__id>:!exists and @id-attrib-names.elems and any(%args{@id-attrib-names}:exists) {
+            %args<__id> = $type-obj.composite-id-resolver(%args);
+
+        } elsif %args<__id>:!exists {
+            %args<__id> = $type-obj.generate-new-object-id;
+        }
+
+        if none(%args{@id-attrib-names}:exists) {
+            %args{@id-attrib-names} = $type-obj.composite-id-decomposer(%args<__id>);
+        }
+
+        return %args;
     }
 
     method get(Any:U: *%args --> Iterable) {
@@ -24,6 +49,8 @@ role UR6::Object {
 class UR6::Object::ClassHOW
     is Metamodel::ClassHOW
 {
+    has $.id-value-separator = "\0";
+
     # I'd like to say "--> Array[Attribute]", but it complains :(
     method id-attributes(Bool :$explicit = False --> Iterable) {
         my @id-attribs = self.attributes(self).grep({ $_ ~~ IsIdAttribute});
@@ -47,6 +74,33 @@ class UR6::Object::ClassHOW
             }
             $comparison;
         };
+    }
+
+    # Returns a closure that can be called for any object
+    multi method composite-id-resolver(--> Callable) {
+        my @id-attrib-names = self.id-attribute-names;
+        return -> UR6::Object $obj {
+            @id-attrib-names.map({ $obj."$_"() }).join($!id-value-separator);
+        }
+    }
+    # Get the composite ID for a particular instance
+    multi method composite-id-resolver(UR6::Object $obj --> Callable) {
+        my @id-attrib-names = self.id-attribute-names;
+        @id-attrib-names.map({ $obj."$_"() }).join($!id-value-separator);
+    }
+    # used by a Context to generate __id for new objects
+    multi method composite-id-resolver(%params --> Str) {
+        my @id-attrib-names = self.id-attribute-names;
+        @id-attrib-names.map({ %params{$_} // '' }).join($!id-value-separator);
+    }
+
+    method composite-id-decomposer(Cool $id --> Iterable) {
+        $id.split( $!id-value-separator, self.id-attributes(:explicit).elems);
+    }
+
+    my Int $id = 0;
+    method generate-new-object-id() {
+        return ++$id;
     }
 }
 

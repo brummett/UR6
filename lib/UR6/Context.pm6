@@ -34,8 +34,3 @@ method pop() returns UR6::Context {
     $current-context = $current-context.parent;
     return $old;
 }
-
-my Int $id = 0;
-method generate-object-id() {
-    return ++$id;
-}
