@@ -52,19 +52,27 @@ class UR6::Object::ClassHOW
     has $.id-value-separator = "\0";
 
     # I'd like to say "--> Array[Attribute]", but it complains :(
-    method id-attributes(Bool :$explicit = False --> Iterable) {
+    multi method id-attributes(Bool :$explicit = False --> Iterable) {
         my @id-attribs = self.attributes(self).grep({ $_ ~~ IsIdAttribute});
         unless $explicit or @id-attribs.elems {
             @id-attribs = self.attributes(self).grep({ .name eq '$!__id'});
         }
         @id-attribs;
     }
-
-    method id-attribute-names(Bool :$explicit = False --> Iterable) {
-        self.id-attributes(:$explicit)>>.name.map({ ($_ ~~ /<[@$%]>'!'(\w+)/)[0].Str });
+    # allows calling via TypeName.^id-attributes()
+    multi method id-attributes(UR6::Object:U $class, *%params) {
+        samewith(|%params);
     }
 
-    method object-sorter(--> Callable) {
+    multi method id-attribute-names(Bool :$explicit = False --> Iterable) {
+        self.id-attributes(:$explicit)>>.name.map({ ($_ ~~ /<[@$%]>'!'(\w+)/)[0].Str });
+    }
+    # allows calling via TypeName.^id-attribute-names()
+    multi method id-attribute-names(UR6::Object:U $class, *%params) {
+        samewith(|%params);
+    }
+
+    multi method object-sorter(--> Callable) {
         my @id-attribute-names = self.id-attribute-names;
         return -> UR6::Object $a, UR6::Object $b {
             my $comparison = Order::Same;
@@ -75,6 +83,10 @@ class UR6::Object::ClassHOW
             $comparison;
         };
     }
+    # allows calling via TypeName.^object-sorter
+    multi method object-sorter(UR6::Object:U $class) {
+        samewith();
+    }
 
     # Returns a closure that can be called for any object
     multi method composite-id-resolver(--> Callable) {
@@ -83,8 +95,12 @@ class UR6::Object::ClassHOW
             @id-attrib-names.map({ $obj."$_"() }).join($!id-value-separator);
         }
     }
+    # allows calling via TypeName.^composite-id-resolver
+    multi method composite-id-resolver(UR6::Object:U $class) {
+        samewith();
+    }
     # Get the composite ID for a particular instance
-    multi method composite-id-resolver(UR6::Object $obj --> Callable) {
+    multi method composite-id-resolver(UR6::Object:D $obj --> Callable) {
         my @id-attrib-names = self.id-attribute-names;
         @id-attrib-names.map({ $obj."$_"() }).join($!id-value-separator);
     }
@@ -94,13 +110,19 @@ class UR6::Object::ClassHOW
         @id-attrib-names.map({ %params{$_} // '' }).join($!id-value-separator);
     }
 
-    method composite-id-decomposer(Cool $id --> Iterable) {
+    multi method composite-id-decomposer(Cool $id --> Iterable) {
         $id.split( $!id-value-separator, self.id-attributes(:explicit).elems);
+    }
+    multi method composite-id-decomposer(UR6::Object:U $class, Cool $id) {
+        samewith($id);
     }
 
     my Int $id = 0;
-    method generate-new-object-id() {
+    multi method generate-new-object-id() {
         return ++$id;
+    }
+    multi method generate-new-object-id(UR6::Object:U $class) {
+        samewith();
     }
 }
 

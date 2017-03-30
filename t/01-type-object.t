@@ -1,7 +1,7 @@
 use UR6;
 use Test;
 
-plan 3;
+plan 4;
 
 subtest 'implied ID attribute' => {
     plan 5;
@@ -95,6 +95,29 @@ subtest 'object-sorter' => {
 
     $sorter = MultiId.HOW.object-sorter;
     is ($o3,$o2,$o1).sort($sorter), ($o1, $o2, $o3), 'sorted multi-id objects';
+}
+
+subtest 'caret methods' => {
+    plan 8;
+    use UR6::Object;
+
+    my class Thingy does UR6::Object {
+        has Int $.a is id;
+    }
+
+    my @id-props = Thingy.^id-attributes;
+    is @id-props.elems, 1, '1 ID attribute';
+    is @id-props[0].name, '$!a', 'name';
+
+    @id-props = Thingy.^id-attribute-names;
+    is @id-props.elems, 1, '1 ID attribute name';
+    is @id-props[0], 'a', 'name';
+
+    ok Thingy.^object-sorter ~~ Callable, 'object-sorter';
+    ok Thingy.^composite-id-resolver ~~ Callable, 'composite-id-resolver';
+
+    ok Thingy.^composite-id-decomposer(123), 'composite-id-decomposer';
+    ok Thingy.^generate-new-object-id, 'generate-new-object-id';
 }
 
 # vim: set syntax=perl6
