@@ -17,14 +17,16 @@ multi sub trait_mod:<is>(Attribute $attr, :$column-name!) is export {
 }
 
 my role HasDataSource[ UR6::DataSource $data-source ] is export(:class-traits) {
-    method data-source { $data-source }
+    multi method data-source() { $data-source }
+    multi method data-source(Mu $class) { $data-source }
 }
 multi sub trait_mod:<is>(Mu:U $class, UR6::DataSource :$data-source!) is export {
     $class.HOW does HasDataSource[$data-source];
 }
 
 my role HasTable[Str $table-name!] is export(:class-traits) {
-    method table-name { $table-name }
+    multi method table-name() { $table-name }
+    multi method table-name(Mu $class) { $table-name }
 }
 multi sub trait_mod:<is>(Mu:U $class, Str :$table-name!) is export {
     $class.HOW does HasTable[$table-name];
