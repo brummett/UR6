@@ -9,11 +9,11 @@ multi sub trait_mod:<is>(Attribute $attr, :$id!) is export {
     $attr does IsIdAttribute;
 }
 
-my role HasColumn[Str $column-name!] is export(:attribute-traits) {
-    method column-name { $column-name }
+my role HasColumn[Str $column!] is export(:attribute-traits) {
+    method column-name { $column }
 }
-multi sub trait_mod:<is>(Attribute $attr, :$column-name!) is export {
-    $attr does HasColumn[$column-name];
+multi sub trait_mod:<is>(Attribute $attr, :$column!) is export {
+    $attr does HasColumn[$column];
 }
 
 my role HasDataSource[ UR6::DataSource $data-source ] is export(:class-traits) {

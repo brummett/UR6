@@ -33,7 +33,7 @@ subtest 'construction' => {
 }
 
 subtest 'column info' => {
-    plan 2;
+    plan 5;
 
     use UR6::Entity;
     my class E does UR6::Entity is data-source(SomeDataSource) is table-name<foo> {
@@ -45,6 +45,10 @@ subtest 'column info' => {
     is E.^table-name, 'foo', 'table name';
     is E.^data-source, SomeDataSource, 'data-source';
 
+    my @columned-attribs = E.^get-attributes(:column);
+    is @columned-attribs.elems, 2, '2 attributes with columns';
+    is-deeply @columned-attribs>>.name, ['$!a', '$!b'], 'columned attribute names';
+    is-deeply E.^get-attribute-names(:column), ('a', 'b'), 'columned get-attribute-names';
 }
 
 # vim: set syntax=perl6

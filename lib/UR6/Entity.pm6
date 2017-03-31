@@ -1,4 +1,4 @@
-use UR6 :class-traits;
+use UR6 :class-traits, :attribute-traits;
 use UR6::Context;
 need UR6::Object;
 use UR6::DataSource;
@@ -14,6 +14,13 @@ class UR6::Entity::ClassHOW
             die "Class $class-name has no data-source";
         }
         nextsame;
+    }
+
+    method get-attributes(Mu $class, Bool :$column=False, *%params) {
+        if $column {
+            return self.get-attributes(self, |%params).grep(* ~~ HasColumn);
+        }
+        nextwith($class, |%params);
     }
 }
 

@@ -65,8 +65,8 @@ class UR6::Object::ClassHOW
     }
 
     # allows calling via TypeName.^id-attribute-names()
-    multi method get-attribute-names(Mu $class, Bool :$id=False, Bool :$explicit=False --> Iterable) {
-        self.get-attributes(:$id, :$explicit)>>.name.map({ ($_ ~~ /<[@$%]>'!'(\w+)/)[0].Str });
+    multi method get-attribute-names(Mu $class, Bool :$id=False, Bool :$explicit=False, *%params --> Iterable) {
+        self.get-attributes(self, :$id, :$explicit, |%params)>>.name.map({ ($_ ~~ /<[@$%]>'!'(\w+)/)[0].Str });
     }
     multi method get-attribute-names(*%params) {
         samewith(self, |%params);
