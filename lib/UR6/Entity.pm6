@@ -13,7 +13,7 @@ class UR6::Entity::ClassHOW
             my $class-name = $class.^name;
             die "Class $class-name has no data-source";
         }
-        callsame;
+        nextsame;
     }
 }
 
