@@ -4,7 +4,7 @@ use Test;
 plan 4;
 
 subtest 'implied ID attribute' => {
-    plan 5;
+    plan 7;
     use UR6::Object;
 
     my class ImpliedId does UR6::Object {
@@ -13,6 +13,10 @@ subtest 'implied ID attribute' => {
 
     my $class-obj = ImpliedId.HOW;
     ok $class-obj ~~ UR6::Object::ClassHOW, 'class obj is-a UR6::Object::ClassHOW';
+
+    my @attribs = $class-obj.get-attributes();
+    is @attribs.elems, 2, 'has 2 attributes';
+    is-deeply @attribs>>.name, ['$!a', '$!__id'], 'attribute names';
 
     my @id-attribs = $class-obj.get-attributes(:id);
     is @id-attribs.elems, 1, 'has 1 ID attribute';
@@ -98,12 +102,16 @@ subtest 'object-sorter' => {
 }
 
 subtest 'caret methods' => {
-    plan 8;
+    plan 10;
     use UR6::Object;
 
     my class Thingy does UR6::Object {
         has Int $.a is id;
     }
+
+    my @props = Thingy.^get-attributes();
+    is @props.elems, 2, '2 attribute';
+    is-deeply @props>>.name, ['$!a', '$!__id'], 'name';
 
     my @id-props = Thingy.^get-attributes(:id);
     is @id-props.elems, 1, '1 ID attribute';

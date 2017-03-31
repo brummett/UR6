@@ -58,7 +58,7 @@ class UR6::Object::ClassHOW
             }
             return @id-attribs;
         }
-        self.attributes(|%params);
+        return self.attributes(self, |%params);
     }
     multi method get-attributes(*%params --> Iterable) {
        samewith(self, |%params);
