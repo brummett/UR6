@@ -1,8 +1,10 @@
 use UR6;
-use UR6::DataSource::Default;
+use UR6::DataSource;
 use Test;
 
 plan 1;
+
+class SomeDataSource does UR6::DataSource { }
 
 subtest 'construction' => {
     plan 6;
@@ -14,15 +16,15 @@ subtest 'construction' => {
 
     eval-lives-ok q :to<CREATE>,
         use UR6::Entity;
-        my class A does UR6::Entity is data-source(UR6::DataSource::Default) { };
-        is A.HOW.data-source, UR6::DataSource::Default, "A's data-source";
+        my class A does UR6::Entity is data-source(SomeDataSource) { };
+        is A.HOW.data-source, SomeDataSource, "A's data-source";
     CREATE
     'Created Entity with data-source';
 
     eval-lives-ok q :to<CREATE>,
         use UR6::Entity;
-        my class A1 does UR6::Entity is data-source(UR6::DataSource::Default) is table-name('foo') { };
-        is A1.HOW.data-source, UR6::DataSource::Default, "A1's data-source";
+        my class A1 does UR6::Entity is data-source(SomeDataSource) is table-name('foo') { };
+        is A1.HOW.data-source, SomeDataSource, "A1's data-source";
         is A1.HOW.table-name, 'foo', "A1's table-name";
     CREATE
     'Created Entity with data-source and table-name';
