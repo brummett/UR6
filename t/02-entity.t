@@ -1,4 +1,3 @@
-use UR6;
 use UR6::DataSource;
 use Test;
 
@@ -15,6 +14,7 @@ subtest 'construction' => {
         "Cannot make an Entity without data-source";
 
     eval-lives-ok q :to<CREATE>,
+        use UR6;
         use UR6::Entity;
         my class A does UR6::Entity is data-source(SomeDataSource) { };
         is A.HOW.data-source, SomeDataSource, "A's data-source";
@@ -22,6 +22,7 @@ subtest 'construction' => {
     'Created Entity with data-source';
 
     eval-lives-ok q :to<CREATE>,
+        use UR6;
         use UR6::Entity;
         my class A1 does UR6::Entity is data-source(SomeDataSource) is table-name('foo') { };
         is A1.HOW.data-source, SomeDataSource, "A1's data-source";

@@ -1,9 +1,5 @@
+use UR6 :attribute-traits;
 use UR6::Context;
-
-my role IsIdAttribute { }
-multi sub trait_mod:<is>(Attribute $attr, :$id!) is export {
-    $attr does IsIdAttribute;
-}
 
 role UR6::Object {
     has $.__id;
