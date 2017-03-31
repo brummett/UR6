@@ -14,12 +14,12 @@ subtest 'implied ID attribute' => {
     my $class-obj = ImpliedId.HOW;
     ok $class-obj ~~ UR6::Object::ClassHOW, 'class obj is-a UR6::Object::ClassHOW';
 
-    my @id-attribs = $class-obj.id-attributes;
+    my @id-attribs = $class-obj.get-attributes(:id);
     is @id-attribs.elems, 1, 'has 1 ID attribute';
     is @id-attribs[0].name, '$!__id', 'is the implied $!__id attribute';
 
-    is $class-obj.id-attributes(:explicit).elems, 0, 'Class has no explicit ID attributes';
-    is $class-obj.id-attribute-names(:explicit).elems, 0, 'Class has no explicit ID attribute names';
+    is $class-obj.get-attributes(:id, :explicit).elems, 0, 'Class has no explicit ID attributes';
+    is $class-obj.get-attribute-names(:id, :explicit).elems, 0, 'Class has no explicit ID attribute names';
 }
 
 subtest 'explicit ID attributes' => {
@@ -31,14 +31,14 @@ subtest 'explicit ID attributes' => {
         has $.not-id;
     }
 
-    my @id-attribs = HasId.HOW.id-attributes;
+    my @id-attribs = HasId.HOW.get-attributes(:id);
     is @id-attribs.elems, 1, 'HasId ID attribute';
     is @id-attribs[0].name, '$!a', 'ID attrib name';
 
     my class HasIdChild is HasId {
         has $.b is id;
     }
-    @id-attribs = HasIdChild.HOW.id-attributes;
+    @id-attribs = HasIdChild.HOW.get-attributes(:id);
     is @id-attribs.elems, 2, 'HasIdChild ID attributes';
     is-deeply @id-attribs>>.name, ['$!b', '$!a'], 'ID attrib names';
 
@@ -47,7 +47,7 @@ subtest 'explicit ID attributes' => {
         has $.b is id;
         has $.c is id;
     }
-    @id-attribs = HasManyId.HOW.id-attributes;
+    @id-attribs = HasManyId.HOW.get-attributes(:id);
     is @id-attribs.elems, 3, 'HasIdChild ID attributes';
     is-deeply @id-attribs>>.name, ['$!a', '$!b', '$!c'], 'ID attrib names';
 }
@@ -105,11 +105,11 @@ subtest 'caret methods' => {
         has Int $.a is id;
     }
 
-    my @id-props = Thingy.^id-attributes;
+    my @id-props = Thingy.^get-attributes(:id);
     is @id-props.elems, 1, '1 ID attribute';
     is @id-props[0].name, '$!a', 'name';
 
-    @id-props = Thingy.^id-attribute-names;
+    @id-props = Thingy.^get-attribute-names(:id);
     is @id-props.elems, 1, '1 ID attribute name';
     is @id-props[0], 'a', 'name';
 

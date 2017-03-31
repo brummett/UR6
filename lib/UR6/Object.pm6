@@ -12,7 +12,7 @@ role UR6::Object {
     method normalize-id-attributes-for-create(%args --> Hash) {
         my $type-obj = self.HOW;
 
-        my @id-attrib-names = $type-obj.id-attribute-names(:explicit);
+        my @id-attrib-names = $type-obj.get-attribute-names(:id, :explicit);
         if %args<__id> and any(%args{@id-attrib-names}:exists) {
             die "Cannot provide both __id and explicit ID attributes to create()";
 
@@ -47,29 +47,33 @@ class UR6::Object::ClassHOW
 {
     has $.id-value-separator = "\0";
 
-    # I'd like to say "--> Array[Attribute]", but it complains :(
-    multi method id-attributes(Bool :$explicit = False --> Iterable) {
-        my @id-attribs = self.attributes(self).grep({ $_ ~~ IsIdAttribute});
-        unless $explicit or @id-attribs.elems {
-            @id-attribs = self.attributes(self).grep({ .name eq '$!__id'});
+    # allows calling via TypeName.^attributes()
+    # I'd rather this were an override of Metamodel::ClassHOW's attributes(), but creating a class
+    # fails with something about iterating a P6Opaque
+    multi method get-attributes(Mu $class, Bool :$explicit=False, Bool :$id=False, *%params --> Iterable) {
+        if $id {
+            my @id-attribs = self.attributes(self).grep({ $_ ~~ IsIdAttribute});
+            unless $explicit or @id-attribs.elems {
+                @id-attribs = self.attributes(self).grep({ .name eq '$!__id'});
+            }
+            return @id-attribs;
         }
-        @id-attribs;
+        self.attributes(|%params);
     }
-    # allows calling via TypeName.^id-attributes()
-    multi method id-attributes(UR6::Object:U $class, *%params) {
-        samewith(|%params);
+    multi method get-attributes(*%params --> Iterable) {
+       samewith(self, |%params);
     }
 
-    multi method id-attribute-names(Bool :$explicit = False --> Iterable) {
-        self.id-attributes(:$explicit)>>.name.map({ ($_ ~~ /<[@$%]>'!'(\w+)/)[0].Str });
-    }
     # allows calling via TypeName.^id-attribute-names()
-    multi method id-attribute-names(UR6::Object:U $class, *%params) {
-        samewith(|%params);
+    multi method get-attribute-names(Mu $class, Bool :$id=False, Bool :$explicit=False --> Iterable) {
+        self.get-attributes(:$id, :$explicit)>>.name.map({ ($_ ~~ /<[@$%]>'!'(\w+)/)[0].Str });
+    }
+    multi method get-attribute-names(*%params) {
+        samewith(self, |%params);
     }
 
     multi method object-sorter(--> Callable) {
-        my @id-attribute-names = self.id-attribute-names;
+        my @id-attribute-names = self.get-attribute-names(:id);
         return -> UR6::Object $a, UR6::Object $b {
             my $comparison = Order::Same;
             for @id-attribute-names -> $name {
@@ -86,7 +90,7 @@ class UR6::Object::ClassHOW
 
     # Returns a closure that can be called for any object
     multi method composite-id-resolver(--> Callable) {
-        my @id-attrib-names = self.id-attribute-names;
+        my @id-attrib-names = self.get-attribute-names(:id);
         return -> UR6::Object $obj {
             @id-attrib-names.map({ $obj."$_"() }).join($!id-value-separator);
         }
@@ -97,17 +101,17 @@ class UR6::Object::ClassHOW
     }
     # Get the composite ID for a particular instance
     multi method composite-id-resolver(UR6::Object:D $obj --> Callable) {
-        my @id-attrib-names = self.id-attribute-names;
+        my @id-attrib-names = self.get-attribute-names(:id);
         @id-attrib-names.map({ $obj."$_"() }).join($!id-value-separator);
     }
     # used by a Context to generate __id for new objects
     multi method composite-id-resolver(%params --> Str) {
-        my @id-attrib-names = self.id-attribute-names;
+        my @id-attrib-names = self.get-attribute-names(:id);
         @id-attrib-names.map({ %params{$_} // '' }).join($!id-value-separator);
     }
 
     multi method composite-id-decomposer(Cool $id --> Iterable) {
-        $id.split( $!id-value-separator, self.id-attributes(:explicit).elems);
+        $id.split( $!id-value-separator, self.get-attributes(:id, :explicit).elems);
     }
     multi method composite-id-decomposer(UR6::Object:U $class, Cool $id) {
         samewith($id);
