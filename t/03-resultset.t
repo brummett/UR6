@@ -1,7 +1,7 @@
 use Test;
 use UR6::DataSource::ResultSet;
 
-plan 1;
+plan 3;
 
 subtest 'construction' => {
     plan 7;
@@ -22,3 +22,25 @@ subtest 'construction' => {
     ok $rs.is-sorted, 'created with :is-sorted';
     ok $rs.is-exact, 'created with :is-exact';
 };
+
+subtest 'empty array content' => {
+    plan 2;
+
+    my $rs = UR6::DataSource::ResultSet.new(content => [], headers => ['a']);
+    ok $rs, 'created resultset with empty array content';
+    my $val := $rs.pull-one;
+    ok $val =:= IterationEnd, 'pull-one returned IterationEnd';
+}
+
+subtest 'with content' => {
+    plan 4;
+
+    my @expected = 1, 2, 3;
+    my $rs = UR6::DataSource::ResultSet.new(content => @expected, headers => ['a']);
+    ok $rs, 'created resultset with array content';
+
+    for @expected -> $expected {
+        my $val := $rs.pull-one;
+        is $val, $expected, 'got expected value';
+    }
+}

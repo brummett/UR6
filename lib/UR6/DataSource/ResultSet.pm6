@@ -30,5 +30,5 @@ submethod BUILD (:$content, :$iterator, :@!headers, Bool :$!is-sorted = False, B
 }
 
 method pull-one {
-    .iterator.pull-one;
+    $!iterator.pull-one;
 }
