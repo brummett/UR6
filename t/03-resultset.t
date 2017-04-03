@@ -1,7 +1,7 @@
 use Test;
 use UR6::DataSource::ResultSet;
 
-plan 3;
+plan 4;
 
 subtest 'construction' => {
     plan 7;
@@ -41,6 +41,24 @@ subtest 'with content' => {
 
     for @expected -> $expected {
         my $val := $rs.pull-one;
+        is $val, $expected, 'got expected value';
+    }
+}
+
+subtest 'with iterator' => {
+    plan 4;
+
+    my @expected = 1, 2, 3;
+
+    my $i = 0;
+    my $iterator = (True but role { method pull-one { @expected[$i++] // IterationEnd } }) does Iterator;
+
+    my $rs = UR6::DataSource::ResultSet.new(iterator => $iterator, headers => ['a']);
+    ok $rs, 'created resultset with iterator';
+
+    for @expected -> $expected {
+        my $val = $rs.pull-one;
+        last if $val =:= IterationEnd;
         is $val, $expected, 'got expected value';
     }
 }
