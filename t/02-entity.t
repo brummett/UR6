@@ -4,7 +4,7 @@ use Test;
 
 plan 2;
 
-class SomeDataSource does UR6::DataSource { }
+class SomeDataSource does UR6::DataSource { method query { ... } };
 
 subtest 'construction' => {
     plan 6;
