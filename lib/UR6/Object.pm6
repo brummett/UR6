@@ -91,16 +91,20 @@ class UR6::Object::ClassHOW
     # Returns a closure that can be called for any object
     multi method composite-id-resolver(--> Callable) {
         my @id-attrib-names = self.get-attribute-names(:id);
-        return -> UR6::Object $obj {
+        my multi sub resolver (UR6::Object $obj --> Str) {
             @id-attrib-names.map({ $obj."$_"() }).join($!id-value-separator);
         }
+        my multi sub resolver (@id-values --> Str) {
+            @id-values.map({ $_ // ''}).join($!id-value-separator);
+        }
+        return &resolver;
     }
     # allows calling via TypeName.^composite-id-resolver
     multi method composite-id-resolver(UR6::Object:U $class) {
         samewith();
     }
     # Get the composite ID for a particular instance
-    multi method composite-id-resolver(UR6::Object:D $obj --> Callable) {
+    multi method composite-id-resolver(UR6::Object:D $obj --> Str) {
         my @id-attrib-names = self.get-attribute-names(:id);
         @id-attrib-names.map({ $obj."$_"() }).join($!id-value-separator);
     }
@@ -108,6 +112,10 @@ class UR6::Object::ClassHOW
     multi method composite-id-resolver(%params --> Str) {
         my @id-attrib-names = self.get-attribute-names(:id);
         @id-attrib-names.map({ %params{$_} // '' }).join($!id-value-separator);
+    }
+    # used by the Loader to turn a row of data into an object ID
+    multi method composite-id-resolver(@id-cols --> Str) {
+        @id-cols.map({ $_ // ''}).join($!id-value-separator);
     }
 
     multi method composite-id-decomposer(Cool $id --> Iterable) {

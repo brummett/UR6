@@ -1,7 +1,7 @@
 use UR6;
 use Test;
 
-plan 4;
+plan 5;
 
 subtest 'implied ID attribute' => {
     plan 7;
@@ -127,5 +127,25 @@ subtest 'caret methods' => {
     ok Thingy.^composite-id-decomposer(123), 'composite-id-decomposer';
     ok Thingy.^generate-new-object-id, 'generate-new-object-id';
 }
+
+subtest 'id resolution' => {
+    plan 6;
+
+    use UR6::Object;
+    my class Thingy does UR6::Object {
+        has Int $.a is id;
+        has Int $.b is id;
+    }
+    my $obj = Thingy.new( a => 1, b => 2 );
+
+    my $resolver = Thingy.^composite-id-resolver();
+    ok $resolver ~~ Callable, 'composite-id-resolver with no args';
+    is $resolver($obj), "1\02", 'called with object';
+    is $resolver((1, 2)), "1\02", 'called with list of values';
+
+    is Thingy.HOW.composite-id-resolver($obj), "1\02", 'composite-id-resolver called with object';
+    is Thingy.HOW.composite-id-resolver((1, 2)), "1\02", 'composite-id-resolver called with list of values';
+    is Thingy.HOW.composite-id-resolver({a => 1, b => 2}), "1\02", 'composite-id-resolver called with hash of values';
+};
 
 # vim: set syntax=perl6
