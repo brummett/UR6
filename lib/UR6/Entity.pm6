@@ -1,7 +1,5 @@
 use UR6 :class-traits, :attribute-traits;
-use UR6::Context;
 need UR6::Object;
-use UR6::DataSource;
 
 role UR6::Entity does UR6::Object { }
 

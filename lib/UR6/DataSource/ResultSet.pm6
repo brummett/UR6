@@ -4,7 +4,9 @@ use UR6::DataSource;
 use UR6::DataSource::LoadingTemplate;
 
 # Like UR's data source iterator
+my $id = 0;
 
+has Int $.id = $id++;
 has Bool $.is-sorted = False; # True if results are sorted by ID attribs and filter -order-by
 has Bool $.is-exact = False; # True if the results exactly match the filters
 has Str @.headers is required;
@@ -16,8 +18,8 @@ submethod BUILD (:$content, :$iterator, :@!headers, Bool :$!is-sorted = False, B
     }
 
     if $content.defined {
-        unless $content ~~ Array {
-            die ":content must be an Array";
+        unless $content ~~ Positional {
+            die ":content must be a Positional";
         }
         $!iterator = $content.iterator;
 
