@@ -24,15 +24,36 @@ class NamedThing
     method __save__ { ... }
 }
 
-subtest 'get' => {
-    plan 5;
-
-    my @objs = NamedThing.get();
-    is @objs.elems, 3, 'get() returned all NamedThing objects';
-    for @objs -> $obj {
-        ok $obj ~~ NamedThing, 'Object is NamedThing';
+class NamedThingResultSetBackwards
+    does UR6::Entity
+    is NamedThing
+    is data-source(UR6::DataSource::Default)
+{
+    method __load__(*%args) {
+        %load-args = %args;
+        UR6::DataSource::ResultSet.new(
+            headers => ('name', 'id'),
+            content => ( ('one', 1), ('two', 2), ('three', 3) )
+        );
     }
-    is %load-args, { filter => {}, headers => <id name> }, 'args to __load__';
+}
+
+subtest 'get' => {
+    plan 2;
+
+    for ( NamedThing, NamedThingResultSetBackwards ) -> $class {
+        subtest "for class { $class.^name }" => {
+            plan 5;
+
+            my @objs = $class.get();
+            is @objs.elems, 3, 'get() returned all NamedThing objects';
+            for @objs -> $obj {
+                #ok $obj ~~ $class, 'Object is NamedThing';
+                isa-ok $obj, $class;
+            }
+            is %load-args, { filter => {}, headers => <id name> }, 'args to __load__';
+        }
+    }
 }
 
 # vim: set syntax=perl6

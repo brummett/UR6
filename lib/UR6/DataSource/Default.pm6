@@ -8,13 +8,14 @@ my class MappingIterator does Iterator {
     submethod BUILD(:$source, :@from, :@to) {
         $!iterator = $source;
 
-        my %from = @from.kv;
+        my %from = @from.antipairs;
         @!mapping = @to.map: { %from{$_} // die "Can't resolve position of column '$_' from the headers returned by its __load__: { @from.gist }" };
     }
 
     method pull-one {
-        my $row = $!iterator.pull-one;
-        $row[@!mapping];
+        my \row = $!iterator.pull-one;
+        return row if row =:= IterationEnd;
+        return row[@!mapping];
     }
 }
 
@@ -38,6 +39,6 @@ class UR6::DataSource::Default does UR6::DataSource {
     }
 
     sub same(@a, @b) {
-        return (@a.elems == @b.elems) and all(@a >>eq<< @b);
+        return (@a.elems == @b.elems and all(@a >>eq<< @b));
     }
 }
