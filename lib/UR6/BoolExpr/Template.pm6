@@ -19,6 +19,13 @@ role UR6::BoolExpr::Template {
     has Str @hints;
 
     method logic-type { ... }
+
+    submethod BUILD(Mu:U :$!subject-class, :@properties) {
+        if @properties.elems == 0 {
+            $!is-id-only = False;
+            $!is-matches-all = True;
+        }
+    }
 }
         
 
