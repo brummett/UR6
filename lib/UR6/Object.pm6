@@ -1,5 +1,6 @@
 use UR6 :attribute-traits;
 use UR6::Context;
+use UR6::BoolExpr;
 
 role UR6::Object {
     has $.__id;
@@ -39,6 +40,10 @@ role UR6::Object {
 
     method delete(Any:D:) {
         UR6::Context.current.delete-entity(self.WHAT, self.__id);
+    }
+
+    method define-boolexpr(*%filters) {
+        return UR6::BoolExpr.new(self.WHAT, |%filters);
     }
 }
 
