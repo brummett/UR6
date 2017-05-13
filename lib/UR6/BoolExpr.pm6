@@ -12,7 +12,7 @@ has @.hard_refs;
 method new(Mu:U $subject-class,
            *%filters,
 ) {
-    my @properties;
+    my @attributes;
     my @operators;
     my @values;
     my @hard_refs;
@@ -20,33 +20,33 @@ method new(Mu:U $subject-class,
     my @extra_keys;
 
     for %filters.kv -> ($key, $value) {
-        my Str ($property, $operator);
+        my Str ($attribute, $operator);
 
         if my $pos = $key.index(' ') {
-            $property = $key.substr(0, $pos);
+            $attribute = $key.substr(0, $pos);
             $operator = $key.substr($pos+1);
         } else {
-            $property = $key;
+            $attribute = $key;
             $operator = '=';
         }
 
-        if $subject-class.has-attribute($property) {
+        if $subject-class.has-attribute($attribute) {
             @extra_keys.push($key);
 
         } else {
-            @properties.push($property);
+            @attributes.push($attribute);
             @operators.push($operator);
             @values.push($value);
         }
     }
 
     if @extra_keys.elems {
-        die "Unknown properties for class { $subject-class.name }: { @extra_keys.join(', ') }";
+        die "Unknown attributes for class { $subject-class.name }: { @extra_keys.join(', ') }";
     }
 
     my $template = UR6::BoolExpr::Template::And.new(
                     subject-class => $subject-class,
-                    properties => @properties,
+                    attributes => @attributes,
                     operators  => @operators,
                 );
     return self.bless(:$template, :@values);

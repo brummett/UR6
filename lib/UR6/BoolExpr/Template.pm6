@@ -4,7 +4,7 @@
 role UR6::BoolExpr::Template {
     #has UR6::Object:U $.subject-class;
     has Mu:U $.subject-class;
-    has Str @.properties;
+    has Str @.attributes;
     has Str @.operators;
 
     has Str $.normalized-id;
@@ -20,8 +20,8 @@ role UR6::BoolExpr::Template {
 
     method logic-type { ... }
 
-    submethod BUILD(Mu:U :$!subject-class, :@properties) {
-        if @properties.elems == 0 {
+    submethod BUILD(Mu:U :$!subject-class, :@attributes) {
+        if @attributes.elems == 0 {
             $!is-id-only = False;
             $!is-matches-all = True;
         }
