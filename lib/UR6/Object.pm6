@@ -46,6 +46,7 @@ class UR6::Object::ClassHOW
     is Metamodel::ClassHOW
 {
     has $.id-value-separator = "\0";
+    has %.__cache;
 
     # allows calling via TypeName.^attributes()
     # I'd rather this were an override of Metamodel::ClassHOW's attributes(), but creating a class
@@ -62,6 +63,16 @@ class UR6::Object::ClassHOW
     }
     multi method get-attributes(*%params --> Iterable) {
        samewith(self, |%params);
+    }
+
+    multi method has-attribute(Mu $class, Str $name --> Bool) {
+        unless self.__cache<has-attribute>:exists {
+            self.__cache<has-attribute> = self.get-attribute-names.Set;
+        }
+        return self.__cache<has-attribute> (cont) $name;
+    }
+    multi method has-attribute(Str $name --> Bool) {
+        samewith(self, $name);
     }
 
     # allows calling via TypeName.^id-attribute-names()

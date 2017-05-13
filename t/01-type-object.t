@@ -102,7 +102,7 @@ subtest 'object-sorter' => {
 }
 
 subtest 'caret methods' => {
-    plan 10;
+    plan 12;
     use UR6::Object;
 
     my class Thingy does UR6::Object {
@@ -126,6 +126,9 @@ subtest 'caret methods' => {
 
     ok Thingy.^composite-id-decomposer(123), 'composite-id-decomposer';
     ok Thingy.^generate-new-object-id, 'generate-new-object-id';
+
+    ok Thingy.^has-attribute('a'), 'class has-attribute a';
+    ok ! Thingy.^has-attribute('nope'), 'class does not has-attribute nope';
 }
 
 subtest 'id resolution' => {
