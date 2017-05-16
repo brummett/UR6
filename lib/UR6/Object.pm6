@@ -43,7 +43,7 @@ role UR6::Object {
     }
 
     method define-boolexpr(*%filters) {
-        return UR6::BoolExpr.new(self.WHAT, |%filters);
+        UR6::BoolExpr.new(self.WHAT, |%filters);
     }
 }
 

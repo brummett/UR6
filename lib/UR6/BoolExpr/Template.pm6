@@ -6,9 +6,9 @@ role UR6::BoolExpr::Template {
     has Mu:U $.subject-class;
     has Str @.attributes;
     has Str @.operators;
+    has Int %.attribute-positions;
 
     has Str $.normalized-id;
-    has Int $.num-values;
 
     has Bool $.is-normalized = False;
     has Bool $.is-id-only = False;
@@ -20,12 +20,27 @@ role UR6::BoolExpr::Template {
 
     method logic-type { ... }
 
-    submethod BUILD(Mu:U :$!subject-class, :@attributes) {
+    submethod BUILD(Mu:U :$!subject-class, :@attributes, :@operators) {
+        %!attribute-positions = @attributes.antipairs;
         if @attributes.elems == 0 {
             $!is-id-only = False;
             $!is-matches-all = True;
         }
+
+        @!attributes = @attributes;
+        @!operators  = @operators;
+    }
+
+    method position-for($name) { %!attribute-positions{$name} }
+
+    method operator-for($name, Bool :$exists) {
+        my $pos = self.position-for($name);
+        if $exists {
+            return defined($pos);
+        } elsif defined($pos) {
+            return @!operators[$pos];
+        } else {
+            return fail "'$name' is not an attribute";
+        }
     }
 }
-        
-
