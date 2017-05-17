@@ -4,11 +4,19 @@ use UR6::Context;
 use UR6::Context::Transaction;
 use Test;
 
-plan 3;
+plan 4;
 
 class Foo does UR6::Object {
     has Int $.param1;
     has Str $.param2;
+}
+
+subtest 'changes outside of transaction' => {
+    plan 1;
+    my $o = Foo.create(param1 => 1, param2 => 'two');
+    ok $o ~~ Failure, 'creating outside of a transaction returns Failure';
+
+    # TODO test that defining an object and changing it throws an exception
 }
 
 UR6::Context.branch(UR6::Context::Transaction);

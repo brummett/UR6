@@ -33,8 +33,8 @@ multi method fetch(Any:U $type where * ~~ UR6::Entity, %filters --> Iterable) {
 }
 
 method store(Array) { return fail }
-method create-entity(Any:U, Hash) { return fail }
-method delete-entity(Any) { return fail }
+method create-entity(Any:U, *%) { fail "Can't create objects in a read-only transaction" }
+method delete-entity(Any, $id) { fail "Can't delete objects in a read-only transaction" }
 
 my sub pull-from-iterator (Iterator $iter is rw) {
     return Nil unless $iter;
