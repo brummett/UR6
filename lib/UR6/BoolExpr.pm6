@@ -5,7 +5,7 @@ use UR6::BoolExpr::Template::And;
 
 unit class UR6::BoolExpr;
 
-has UR6::BoolExpr::Template $.template handles <subject-class is-normalized is-id-only is-partial-id is-unique is-matches-all position-for operator-for>;
+has UR6::BoolExpr::Template $.template handles <subject-class is-normalized is-id-only is-partial-id is-unique is-matches-all position-for operator-for attributes operators>;
 has @.values;
 has @.hard_refs;
 

@@ -27,7 +27,7 @@ subtest 'basic' => {
 };
 
 subtest 'filters' => {
-    plan 26;
+    plan 32;
 
     my $bx = Foo.define-boolexpr(param1 => 123, param2 => '<' => 456);
     isa-ok $bx, UR6::BoolExpr;
@@ -48,6 +48,16 @@ subtest 'filters' => {
     isa-ok $bx.value-for('nope'), Failure, 'value for non-existant param is-a Failure';
     is $bx.value-for('nope', :exists), False, 'value for non-existant does not exist';
     ok ! $bx.position-for('nope').defined, 'position-for non-existant param';
+
+    my @attributes = $bx.attributes;
+    my @operators = $bx.operators;
+    my @values = $bx.values;
+    is @attributes[ $bx.position-for('param1') ], 'param1', 'param1 @attributes';
+    is @values[ $bx.position-for('param1') ], 123, 'param1 @values';
+    is @operators[ $bx.position-for('param1')], '=', 'param1 @operators';
+    is @attributes[ $bx.position-for('param2') ], 'param2', 'param1 @attributes';
+    is @values[ $bx.position-for('param2') ], 456, 'param2 @values';
+    is @operators[ $bx.position-for('param2')], '<', 'param2 @operators';
 
     my $tmpl = $bx.template;
     ok ! $tmpl.is-matches-all, 'bx with filters is not matches-all';
