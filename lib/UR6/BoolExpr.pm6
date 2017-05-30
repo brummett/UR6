@@ -51,6 +51,12 @@ method new(Mu:U $subject-class,
     return self.bless(:$template, :@values);
 }
 
+method gist() {
+    my @filters = do for self.attributes -> $attribute
+        { ( $attribute, self.operator-for($attribute), self.value-for($attribute) ).join(' => ') ~ ')' }
+    return 'BoolExpr=(' ~ self.subject-class.^name ~ ': ' ~ @filters.join(', ');
+}
+
 method value-for-id() { ... }
 
 method value-for($name, Bool :$exists) {

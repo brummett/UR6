@@ -4,7 +4,7 @@ use UR6::BoolExpr;
 use UR6::BoolExpr::Template::And;
 use Test;
 
-plan 2;
+plan 3;
 
 class Foo does UR6::Object {
     has Int $.param1 is id;
@@ -25,6 +25,22 @@ subtest 'basic' => {
     ok $bx.template.is-matches-all, 'template no filters matches all';
     ok ! $bx.template.is-id-only, 'template no filters is not id-only';
 };
+
+subtest 'gist' => {
+    plan 6;
+
+    my $bx = Foo.define-boolexpr(param1 => '<' => 123, param2 => 'Bob');
+    my $str = $bx.gist;
+    like $str, /'Foo:'/, 'saw class name';
+    like $str, /'param1 => < => 123'/, 'saw filter on param1';
+    like $str, /'param2 => = => Bob'/, 'saw filter on param2';
+
+    my $bxt = $bx.template;
+    $str = $bxt.gist;
+    like $str, /'Foo:'/, 'saw class name on template';
+    like $str, /'param1 => <'/, 'saw filter on param1';
+    like $str, /'param2 => ='/, 'saw filter on param2';
+}
 
 subtest 'filters' => {
     plan 32;

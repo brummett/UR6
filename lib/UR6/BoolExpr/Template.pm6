@@ -43,4 +43,10 @@ role UR6::BoolExpr::Template {
             return fail "'$name' is not an attribute";
         }
     }
+
+    method gist() {
+        my @filters = do for self.attributes -> $attribute
+            { ($attribute, self.operator-for($attribute)).join(' => ') }
+        return 'BoolExpr::Template=(' ~ self.subject-class.^name ~ ': ' ~ @filters.join(', ') ~ ')';
+    }
 }
