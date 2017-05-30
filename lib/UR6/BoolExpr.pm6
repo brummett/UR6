@@ -79,3 +79,6 @@ method remove-filter() { ... }
 
 method sub-classify() { ... }
 
+method evaluate($obj --> Bool) {
+    self.template.evaluate(subject => $obj, values => self.values);
+}

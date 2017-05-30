@@ -1,12 +1,15 @@
 #use UR6;
 #need UR6::Object;
 
-role UR6::BoolExpr::Template {
+use UR6::BoolExpr::Evaluator;
+
+role UR6::BoolExpr::Template does UR6::BoolExpr::Evaluator {
     #has UR6::Object:U $.subject-class;
     has Mu:U $.subject-class;
     has Str @.attributes;
     has Str @.operators;
     has Int %.attribute-positions;
+    has UR6::BoolExpr::Evaluator @!underlying-templates;
 
     has Str $.normalized-id;
 
@@ -19,6 +22,7 @@ role UR6::BoolExpr::Template {
     has Str @hints;
 
     method logic-type { ... }
+    method underlying-templates() { ... }
 
     submethod BUILD(Mu:U :$!subject-class, :@attributes, :@operators) {
         %!attribute-positions = @attributes.antipairs;

@@ -2,9 +2,10 @@ use UR6;
 use UR6::Object;
 use UR6::BoolExpr;
 use UR6::BoolExpr::Template::And;
+use UR6::Context::Transaction;
 use Test;
 
-plan 3;
+plan 4;
 
 class Foo does UR6::Object {
     has Int $.param1 is id;
@@ -92,5 +93,18 @@ subtest 'filters' => {
     ok $tmpl.position-for('param2').defined, 'position-for param2';
 }
 
+subtest 'evaluate' => sub {
+    plan 1;
+
+    UR6::Context.branch(UR6::Context::Transaction);
+
+    my $obj = Foo.create(param1 => 123, param2 => '456');
+    my @tests = ( Foo.define-boolexpr(param1 => 123, param2 => '456') => True);
+    for @tests -> $test {
+        my ($bx, $expected) = $test.kv;
+
+        is $bx.evaluate($obj), $expected, "evaluate { $bx.gist }";
+    }
+}
 
 # vim: set syntax=perl6
