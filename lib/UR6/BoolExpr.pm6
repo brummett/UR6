@@ -66,7 +66,7 @@ method value-for($name, Bool :$exists) {
     } elsif defined($pos) {
         return @!values[$pos];
     } else {
-        return fail "'$name' is not an attribute";
+        fail "'$name' is not an attribute";
     }
 }
 

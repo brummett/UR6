@@ -44,7 +44,7 @@ role UR6::BoolExpr::Template does UR6::BoolExpr::Evaluator {
         } elsif defined($pos) {
             return @!operators[$pos];
         } else {
-            return fail "'$name' is not an attribute";
+            fail "'$name' is not an attribute";
         }
     }
 
