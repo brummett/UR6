@@ -32,20 +32,25 @@ multi sub trait_mod:<is>(Mu:U $class, Str :$table-name!) is export {
     $class.HOW does HasTable[$table-name];
 }
 
-my role IsMemoized is export(:method-traits) { }
+my role IsMemoized is export(:method-traits) {
+    has %!cached;
+
+    method is-set(Any:D $invocant --> Bool) { %!cached{$invocant.WHICH}:exists }
+    multi method value(Any:D $invocant) { %!cached{$invocant.WHICH} }
+    multi method value(Any:D $invocant, $value) { %!cached{$invocant.WHICH} = $value }
+}
 multi sub trait_mod:<is>(Method $meth, Bool :$memoized!) is export {
     unless $meth.arity == 1 {
         die "Can't memoize a sub that requires arguments other than 'self'";
     }
-    my Bool $is-set = False;
-    my $value;
+
     $meth does IsMemoized;
     $meth.wrap( method () {
-        unless $is-set {
-            $value := callsame;
-            $is-set = True;
+        unless $meth.is-set(self) {
+            my $value := callsame;
+            $meth.value(self, $value);
         }
-        $value;
+        $meth.value(self);
     });
 }
 

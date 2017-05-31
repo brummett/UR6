@@ -1,7 +1,7 @@
 use Test;
 use UR6;
 
-plan 1;
+plan 2;
 
 class Foo {
     has Int $.scalar;
@@ -47,4 +47,16 @@ subtest 'basic' => {
     check-call-counts(1);
     check-values;
     check-call-counts(1);
+}
+
+subtest 'multiple instances' => {
+    plan 4;
+
+    my $a = Foo.new(scalar => 1);
+    my $b = Foo.new(scalar => 5);
+
+    is $a.scalar-double, 2, 'doubled $a';
+    is $b.scalar-double, 10, 'doubled $a';
+    is $a.scalar-called, 1, '$a called once';
+    is $b.scalar-called, 1, '$b called once';
 }
