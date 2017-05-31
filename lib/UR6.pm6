@@ -35,7 +35,7 @@ multi sub trait_mod:<is>(Mu:U $class, Str :$table-name!) is export {
 my role HasMemoizedMethods { ... }
 my role IsMemoized[Method $meth] is export(:method-traits) {
     my $is-set-attr = Attribute.new(:name('__' ~ $meth.name ~ '-is-memoized'), :type(Bool), :package($meth.package));
-    my $value-attr  = Attribute.new(:name('__' ~ $meth.name ~ '-memoized-value'), :type(Any), :package($meth.package));
+    my $value-attr  = Attribute.new(:name('__' ~ $meth.name ~ '-memoized-value'), :type($meth.signature.returns), :package($meth.package));
     $meth.package.^add_attribute($is-set-attr);
     $meth.package.^add_attribute($value-attr);
 
