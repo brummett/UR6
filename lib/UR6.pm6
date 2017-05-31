@@ -33,14 +33,14 @@ multi sub trait_mod:<is>(Mu:U $class, Str :$table-name!) is export {
 }
 
 my role IsMemoized[Method $meth] is export(:method-traits) {
-    my $is-set-attr = Attribute.new(:name('_' ~ $meth.name ~ '-is-set'), :type(Bool), :package($meth.package));
-    my $value-attr  = Attribute.new(:name('_' ~ $meth.name ~ '-memoized-value'), :type(Any), :package($meth.package));
+    my $is-set-attr = Attribute.new(:name('__' ~ $meth.name ~ '-is-memoized'), :type(Bool), :package($meth.package));
+    my $value-attr  = Attribute.new(:name('__' ~ $meth.name ~ '-memoized-value'), :type(Any), :package($meth.package));
     $meth.package.^add_attribute($is-set-attr);
     $meth.package.^add_attribute($value-attr);
 
-    method is-set(Any:D $invocant --> Bool) { $is-set-attr.get_value($invocant) }
-    multi method value(Any:D $invocant) { $value-attr.get_value($invocant) }
-    multi method value(Any:D $invocant, \new_value) { $value-attr.set_value($invocant, new_value); $is-set-attr.set_value($invocant, True); }
+    method is-memoized(Any:D $invocant --> Bool) { $is-set-attr.get_value($invocant) }
+    multi method memoized-value(Any:D $invocant) { $value-attr.get_value($invocant) }
+    multi method memoized-value(Any:D $invocant, \new_value) { $value-attr.set_value($invocant, new_value); $is-set-attr.set_value($invocant, True); }
 }
 multi sub trait_mod:<is>(Method $meth, Bool :$memoized!) is export {
     unless $meth.arity == 1 {
@@ -48,11 +48,11 @@ multi sub trait_mod:<is>(Method $meth, Bool :$memoized!) is export {
     }
     $meth does IsMemoized[$meth];
     $meth.wrap( method () {
-        unless $meth.is-set(self) {
+        unless $meth.is-memoized(self) {
             my $value := callsame;
-            $meth.value(self, $value);
+            $meth.memoized-value(self, $value);
         }
-        $meth.value(self);
+        $meth.memoized-value(self);
     });
 }
 
