@@ -1,7 +1,7 @@
 use Test;
 use UR6;
 
-plan 2;
+plan 3;
 
 class Foo {
     has Int $.scalar;
@@ -59,4 +59,27 @@ subtest 'multiple instances' => {
     is $b.scalar-double, 10, 'doubled $a';
     is $a.scalar-called, 1, '$a called once';
     is $b.scalar-called, 1, '$b called once';
+}
+
+subtest 'invalidating data' => {
+    plan 14;
+
+    my $a = Foo.new(scalar => 1, array => (1,2,3));
+
+    is $a.scalar-double, 2, 'doubled scalar';
+    is $a.array-double, (2,4,6), 'doubled array';
+    is $a.scalar-called, 1, 'scalar called once';
+    is $a.array-called, 1, 'array called once';
+
+    ok $a.__scalar-double-invalidate-memoized, 'invaliate $a';
+    is $a.scalar-double, 2, 'double scalar again';
+    is $a.array-double, (2,4,6), 'double array again';
+    is $a.scalar-called, 2, 'scalar called twice';
+    is $a.array-called, 1, 'array still called once';
+
+    ok $a.__invalidate-all-memoized-values, 'invalidate all values';
+    is $a.scalar-double, 2, 'double scalar again';
+    is $a.array-double, (2,4,6), 'doubled array again';
+    is $a.scalar-called, 3, 'scalar called three times';
+    is $a.array-called, 2, 'array called twice';
 }

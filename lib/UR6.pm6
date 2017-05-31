@@ -32,6 +32,7 @@ multi sub trait_mod:<is>(Mu:U $class, Str :$table-name!) is export {
     $class.HOW does HasTable[$table-name];
 }
 
+my role HasMemoizedMethods { ... }
 my role IsMemoized[Method $meth] is export(:method-traits) {
     my $is-set-attr = Attribute.new(:name('__' ~ $meth.name ~ '-is-memoized'), :type(Bool), :package($meth.package));
     my $value-attr  = Attribute.new(:name('__' ~ $meth.name ~ '-memoized-value'), :type(Any), :package($meth.package));
@@ -41,6 +42,15 @@ my role IsMemoized[Method $meth] is export(:method-traits) {
     method is-memoized(Any:D $invocant --> Bool) { $is-set-attr.get_value($invocant) }
     multi method memoized-value(Any:D $invocant) { $value-attr.get_value($invocant) }
     multi method memoized-value(Any:D $invocant, \new_value) { $value-attr.set_value($invocant, new_value); $is-set-attr.set_value($invocant, True); }
+
+    method invalidate-memoized-value(Any:D $invocant) { $is-set-attr.set_value($invocant, False); 1 }
+    $meth.package.^add_method('__' ~ $meth.name ~ '-invalidate-memoized', method () { $meth.invalidate-memoized-value(self) });
+    $meth.package.^add_role(HasMemoizedMethods) unless $meth.package.^roles_to_compose.grep(* ~~ HasMemoizedMethods);
+}
+my role HasMemoizedMethods is export(:class-traits) {
+    method __invalidate-all-memoized-values {
+        self.^methods.grep( * ~~ IsMemoized )>>.invalidate-memoized-value(self);
+    }
 }
 multi sub trait_mod:<is>(Method $meth, Bool :$memoized!) is export {
     unless $meth.arity == 1 {
