@@ -32,19 +32,21 @@ multi sub trait_mod:<is>(Mu:U $class, Str :$table-name!) is export {
     $class.HOW does HasTable[$table-name];
 }
 
-my role IsMemoized is export(:method-traits) {
-    has %!cached;
+my role IsMemoized[Method $meth] is export(:method-traits) {
+    my $is-set-attr = Attribute.new(:name('_' ~ $meth.name ~ '-is-set'), :type(Bool), :package($meth.package));
+    my $value-attr  = Attribute.new(:name('_' ~ $meth.name ~ '-memoized-value'), :type(Any), :package($meth.package));
+    $meth.package.^add_attribute($is-set-attr);
+    $meth.package.^add_attribute($value-attr);
 
-    method is-set(Any:D $invocant --> Bool) { %!cached{$invocant.WHICH}:exists }
-    multi method value(Any:D $invocant) { %!cached{$invocant.WHICH} }
-    multi method value(Any:D $invocant, $value) { %!cached{$invocant.WHICH} = $value }
+    method is-set(Any:D $invocant --> Bool) { $is-set-attr.get_value($invocant) }
+    multi method value(Any:D $invocant) { $value-attr.get_value($invocant) }
+    multi method value(Any:D $invocant, \new_value) { $value-attr.set_value($invocant, new_value); $is-set-attr.set_value($invocant, True); }
 }
 multi sub trait_mod:<is>(Method $meth, Bool :$memoized!) is export {
     unless $meth.arity == 1 {
         die "Can't memoize a sub that requires arguments other than 'self'";
     }
-
-    $meth does IsMemoized;
+    $meth does IsMemoized[$meth];
     $meth.wrap( method () {
         unless $meth.is-set(self) {
             my $value := callsame;
