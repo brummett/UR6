@@ -20,14 +20,10 @@ method new(Mu:U $subject-class,
     my @extra_keys;
 
     for %filters.kv -> $attribute, $val {
-        my ($operator, $value);
-
-        if $val ~~ Pair {
-            ($operator, $value) = $val.kv
-        } else {
-            $operator = '=';
-            $value = $val;
-        }
+        my ($operator, $value) = do given $val {
+            when Pair   { $val.kv }
+            default     { ('=', $val) }
+        };
 
         if ! $subject-class.^has-attribute($attribute) {
             @extra_keys.push($attribute);
