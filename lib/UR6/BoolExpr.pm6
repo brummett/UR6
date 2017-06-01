@@ -22,6 +22,7 @@ method new(Mu:U $subject-class,
     for %filters.kv -> $attribute, $val {
         my ($operator, $value) = do given $val {
             when Pair   { $val.kv }
+            when Range  { ('between', $val) }
             default     { ('=', $val) }
         };
 

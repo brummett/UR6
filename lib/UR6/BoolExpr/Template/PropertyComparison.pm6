@@ -11,6 +11,7 @@ class UR6::BoolExpr::Template::PropertyComparison::LessOrEqual { ... }
 class UR6::BoolExpr::Template::PropertyComparison::Le { ... }
 class UR6::BoolExpr::Template::PropertyComparison::GreaterOrEqual { ... }
 class UR6::BoolExpr::Template::PropertyComparison::Ge { ... }
+class UR6::BoolExpr::Template::PropertyComparison::Between { ... }
 
 class UR6::BoolExpr::Template::PropertyComparison does UR6::BoolExpr::Evaluator {
     has $.attribute-name;
@@ -81,3 +82,6 @@ class UR6::BoolExpr::Template::PropertyComparison::Ge is UR6::BoolExpr::Template
     method evaluate(Any:D :$subject, Stringy :$value) { $subject."{ self.attribute-name }"() ge $value }
 }
 
+class UR6::BoolExpr::Template::PropertyComparison::Between is UR6::BoolExpr::Template::PropertyComparison {
+    method evaluate(Any:D :$subject, Range :$value) { $subject."{ self.attribute-name }"() ~~ $value }
+}
