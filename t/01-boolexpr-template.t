@@ -112,6 +112,16 @@ subtest 'evaluate' => sub {
                   Foo.define-boolexpr(param1 => '<=' => 100)            => False,
                   Foo.define-boolexpr(param1 => '>=' => 999)            => False,
                   Foo.define-boolexpr(param1 => '>=' => 100)            => True,
+                  Foo.define-boolexpr(param1 => 'eq' => '123')          => True,
+                  Foo.define-boolexpr(param1 => 'eq' => '999')          => False,
+                  Foo.define-boolexpr(param1 => 'lt' => '200')          => True,
+                  Foo.define-boolexpr(param1 => 'lt' => '100')          => False,
+                  Foo.define-boolexpr(param1 => 'gt' => '100')          => True,
+                  Foo.define-boolexpr(param1 => 'gt' => '200')          => False,
+                  Foo.define-boolexpr(param1 => 'le' => '200')          => True,
+                  Foo.define-boolexpr(param1 => 'le' => '100')          => False,
+                  Foo.define-boolexpr(param1 => 'ge' => '100')          => True,
+                  Foo.define-boolexpr(param1 => 'ge' => '200')          => False,
                 );
 
     plan @tests.elems;
