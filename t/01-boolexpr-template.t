@@ -94,12 +94,27 @@ subtest 'filters' => {
 }
 
 subtest 'evaluate' => sub {
-    plan 1;
 
     UR6::Context.branch(UR6::Context::Transaction);
 
     my $obj = Foo.create(param1 => 123, param2 => '456');
-    my @tests = ( Foo.define-boolexpr(param1 => 123, param2 => '456') => True);
+    my @tests = ( Foo.define-boolexpr(param1 => 123, param2 => '456')   => True,
+                  Foo.define-boolexpr(param1 => 123)                    => True,
+                  Foo.define-boolexpr(param2 => 456)                    => True,
+                  Foo.define-boolexpr(param1 => 999)                    => False,
+                  Foo.define-boolexpr(param1 => 123, param2 => 999)     => False,
+                  Foo.define-boolexpr()                                 => True,
+                  Foo.define-boolexpr(param1 => '<' => 200)             => True,
+                  Foo.define-boolexpr(param1 => '>' => 200)             => False,
+                  Foo.define-boolexpr(param1 => '=' => 123, param2 => '>' => 123) => True,
+                  Foo.define-boolexpr(param1 => '=' => 999)             => False,
+                  Foo.define-boolexpr(param1 => '<=' => 999)            => True,
+                  Foo.define-boolexpr(param1 => '<=' => 100)            => False,
+                  Foo.define-boolexpr(param1 => '>=' => 999)            => False,
+                  Foo.define-boolexpr(param1 => '>=' => 100)            => True,
+                );
+
+    plan @tests.elems;
     for @tests -> $test {
         my ($bx, $expected) = $test.kv;
 
