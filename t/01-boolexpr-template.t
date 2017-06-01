@@ -122,6 +122,10 @@ subtest 'evaluate' => sub {
                   Foo.define-boolexpr(param1 => 'le' => '100')          => False,
                   Foo.define-boolexpr(param1 => 'ge' => '100')          => True,
                   Foo.define-boolexpr(param1 => 'ge' => '200')          => False,
+                  Foo.define-boolexpr(param1 => '!=' => 200)            => True,
+                  Foo.define-boolexpr(param1 => '!=' => 123)            => False,
+                  Foo.define-boolexpr(param1 => 'not >' => 200)         => True,
+                  Foo.define-boolexpr(param1 => 'not >' => 100)         => False,
                 );
 
     plan @tests.elems;
