@@ -23,6 +23,7 @@ method new(Mu:U $subject-class,
         my ($operator, $value) = do given $val {
             when Pair   { $val.kv }
             when Range  { ('between', $val) }
+            when Regex  { ('like', $val) }
             default     { ('=', $val) }
         };
 

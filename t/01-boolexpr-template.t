@@ -128,6 +128,15 @@ subtest 'evaluate' => sub {
                   Foo.define-boolexpr(param1 => 'not >' => 100)         => False,
                   Foo.define-boolexpr(param1 => 100..200)               => True,
                   Foo.define-boolexpr(param1 => 'between' => 0..100)    => False,
+                  Foo.define-boolexpr(param1 => rx/1/)                  => True,
+                  Foo.define-boolexpr(param1 => 'like' => rx/1/)        => True,
+                  Foo.define-boolexpr(param1 => 'like' => rx/5/)        => False,
+                  Foo.define-boolexpr(param1 => 'like' => '123')        => True,
+                  Foo.define-boolexpr(param1 => 'like' => '1_3')        => True,
+                  Foo.define-boolexpr(param1 => 'like' => '1%')         => True,
+                  Foo.define-boolexpr(param1 => 'like' => '%3')         => True,
+                  Foo.define-boolexpr(param1 => 'like' => '%')          => True,
+                  Foo.define-boolexpr(param1 => 'like' => '12')         => False,
                 );
 
     plan @tests.elems;

@@ -12,6 +12,7 @@ class UR6::BoolExpr::Template::PropertyComparison::Le { ... }
 class UR6::BoolExpr::Template::PropertyComparison::GreaterOrEqual { ... }
 class UR6::BoolExpr::Template::PropertyComparison::Ge { ... }
 class UR6::BoolExpr::Template::PropertyComparison::Between { ... }
+class UR6::BoolExpr::Template::PropertyComparison::Like { ... }
 
 class UR6::BoolExpr::Template::PropertyComparison does UR6::BoolExpr::Evaluator {
     has $.attribute-name;
@@ -82,6 +83,42 @@ class UR6::BoolExpr::Template::PropertyComparison::Ge is UR6::BoolExpr::Template
     method evaluate(Any:D :$subject, Stringy :$value) { $subject."{ self.attribute-name }"() ge $value }
 }
 
+class UR6::BoolExpr::Template::PropertyComparison::In is UR6::BoolExpr::Template::PropertyComparison {
+    method evaluate(Any:D :$subject, Numeric :$value) { $subject."{ self.attribute-name }"() >= $value }
+}
+
 class UR6::BoolExpr::Template::PropertyComparison::Between is UR6::BoolExpr::Template::PropertyComparison {
     method evaluate(Any:D :$subject, Range :$value) { $subject."{ self.attribute-name }"() ~~ $value }
+}
+
+class UR6::BoolExpr::Template::PropertyComparison::Like is UR6::BoolExpr::Template::PropertyComparison {
+
+    my grammar LikeExpression {
+        rule TOP { <atom>* }
+        proto token atom { * }
+        token atom:sym<underscore> { '_' }
+        token atom:sym<percent>    { '%' }
+        token atom:sym<literal>     { (<-[%_]>+) }
+    }
+    my class ToRegex {
+        method TOP ($/) {
+            # FIXME - is there a way to programmatically build up a regex?
+            use MONKEY-SEE-NO-EVAL;
+            make EVAL 'rx/^' ~ @<atom>>>.made.join(' ') ~ '$/'
+        }
+        method atom:sym<underscore> ($/) { make '.' }
+        method atom:sym<percent> ($/) { make '.*' }
+        method atom:sym<literal> ($/) { make "'" ~ $/[0] ~ "'" }
+    }
+    has %!value-regexes;
+    multi method evaluate(Any:D :$subject, Regex :$value)   { $subject."{ self.attribute-name }"() ~~ $value }
+    multi method evaluate(Any:D :$subject, Str :$value)     { $subject."{ self.attribute-name }"() ~~ self.str-to-regex($value) }
+    method str-to-regex(Str $str --> Regex) {
+        unless %!value-regexes{$str}:exists {
+            my $parsed = LikeExpression.parse($str, :actions(ToRegex.new));
+            die "Couldn't parse like expression: $str" unless $parsed;
+            %!value-regexes{$str} = $parsed.made;
+        }
+        %!value-regexes{$str};
+    }
 }
