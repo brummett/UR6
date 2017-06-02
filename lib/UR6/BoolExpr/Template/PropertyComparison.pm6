@@ -11,6 +11,7 @@ class UR6::BoolExpr::Template::PropertyComparison::LessOrEqual { ... }
 class UR6::BoolExpr::Template::PropertyComparison::Le { ... }
 class UR6::BoolExpr::Template::PropertyComparison::GreaterOrEqual { ... }
 class UR6::BoolExpr::Template::PropertyComparison::Ge { ... }
+class UR6::BoolExpr::Template::PropertyComparison::In { ... }
 class UR6::BoolExpr::Template::PropertyComparison::Between { ... }
 class UR6::BoolExpr::Template::PropertyComparison::Like { ... }
 
@@ -84,7 +85,9 @@ class UR6::BoolExpr::Template::PropertyComparison::Ge is UR6::BoolExpr::Template
 }
 
 class UR6::BoolExpr::Template::PropertyComparison::In is UR6::BoolExpr::Template::PropertyComparison {
-    method evaluate(Any:D :$subject, Numeric :$value) { $subject."{ self.attribute-name }"() >= $value }
+    multi method evaluate(Any:D :$subject, Setty :$value)       { $subject."{ self.attribute-name }"() (elem) $value }
+    multi method evaluate(Any:D :$subject, Positional :$value)  { $subject."{ self.attribute-name }"() (elem) $value }
+    multi method evaluate(Any:D :$subject, :$value)             { $subject."{ self.attribute-name }"() (elem) set($value) }
 }
 
 class UR6::BoolExpr::Template::PropertyComparison::Between is UR6::BoolExpr::Template::PropertyComparison {

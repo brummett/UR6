@@ -137,6 +137,11 @@ subtest 'evaluate' => sub {
                   Foo.define-boolexpr(param1 => 'like' => '%3')         => True,
                   Foo.define-boolexpr(param1 => 'like' => '%')          => True,
                   Foo.define-boolexpr(param1 => 'like' => '12')         => False,
+                  Foo.define-boolexpr(param1 => set(123, 456))          => True,
+                  Foo.define-boolexpr(param1 => 'in' => (123, 456))     => True,
+                  Foo.define-boolexpr(param1 => 'in' => set(123, 456))  => True,
+                  Foo.define-boolexpr(param1 => 'in' => ())             => False,
+                  Foo.define-boolexpr(param1 => 'in' => (456))          => False,
                 );
 
     plan @tests.elems;

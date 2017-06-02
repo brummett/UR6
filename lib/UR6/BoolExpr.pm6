@@ -24,6 +24,7 @@ method new(Mu:U $subject-class,
             when Pair   { $val.kv }
             when Range  { ('between', $val) }
             when Regex  { ('like', $val) }
+            when Setty  { ('in', $val) }
             default     { ('=', $val) }
         };
 
