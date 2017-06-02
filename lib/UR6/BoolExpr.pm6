@@ -50,7 +50,7 @@ method new(Mu:U $subject-class,
 
 method gist() {
     my @filters = do for self.attributes -> $attribute
-        { ( $attribute, self.operator-for($attribute), self.value-for($attribute) ).join(' => ') }
+        { ( $attribute, self.operator-for($attribute), self.value-for($attribute).gist ).join(' => ') }
     return 'BoolExpr=(' ~ self.subject-class.^name ~ ': ' ~ @filters.join(', ') ~ ')';
 }
 
