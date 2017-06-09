@@ -1,13 +1,12 @@
-use UR6 :attribute-traits;
-use UR6::Context;
+use UR6 :attribute-traits, :context;
 use UR6::BoolExpr;
 
-role UR6::Object {
+class UR6::Object {
     has $.__id;
 
     method create(Any:U: *%args --> UR6::Object) {
         my %normalized-args = self.normalize-id-attributes-for-create(%args);
-        UR6::Context.current.create-entity(self.WHAT, |%normalized-args);
+        current-context.create-entity(self.WHAT, |%normalized-args);
     }
 
     method normalize-id-attributes-for-create(%args --> Hash) {
@@ -35,11 +34,11 @@ role UR6::Object {
     }
 
     method get(Any:U: *%args --> Iterable) {
-        UR6::Context.current.fetch(self.WHAT, %args);
+        current-context.fetch(self.WHAT, %args);
     }
 
     method delete(Any:D:) {
-        UR6::Context.current.delete-entity(self.WHAT, self.__id);
+        current-context.delete-entity(self.WHAT, self.__id);
     }
 
     method define-boolexpr(*%filters) {

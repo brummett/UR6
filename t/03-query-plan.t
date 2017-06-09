@@ -11,7 +11,7 @@ subtest 'basic' => {
 
     use UR6;
     use UR6::Entity;
-    my class Foo does UR6::Entity is data-source(DummyDataSource) is table-name<foo> {
+    my class Foo is UR6::Object does UR6::Entity is data-source(DummyDataSource) is table-name<foo> {
         has $.id is id is column<id_col>;
         has $.name is column<name>;
         has $.val is column<val>;

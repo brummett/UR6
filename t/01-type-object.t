@@ -7,7 +7,7 @@ subtest 'implied ID attribute' => {
     plan 7;
     use UR6::Object;
 
-    my class ImpliedId does UR6::Object {
+    my class ImpliedId is UR6::Object {
         has $.a;
     }
 
@@ -30,7 +30,7 @@ subtest 'explicit ID attributes' => {
     plan 6;
     use UR6::Object;
 
-    my class HasId does UR6::Object {
+    my class HasId is UR6::Object {
         has $.a is id;
         has $.not-id;
     }
@@ -46,7 +46,7 @@ subtest 'explicit ID attributes' => {
     is @id-attribs.elems, 2, 'HasIdChild ID attributes';
     is-deeply @id-attribs>>.name, ['$!b', '$!a'], 'ID attrib names';
 
-    my class HasManyId does UR6::Object {
+    my class HasManyId is UR6::Object {
         has $.a is id;
         has $.b is id;
         has $.c is id;
@@ -60,7 +60,7 @@ subtest 'object-sorter' => {
     plan 9;
     use UR6::Object;
 
-    my class Strs does UR6::Object {
+    my class Strs is UR6::Object {
         has Str $.a is id;
     }
     my $o1 = Strs.new(a => 'a');
@@ -74,7 +74,7 @@ subtest 'object-sorter' => {
     is $sorter($o1, $o3), Order::Same, 'a sorts same as a, different objects';
 
 
-    my class Ints does UR6::Object {
+    my class Ints is UR6::Object {
         has Int $.a is id;
     }
     $o1 = Ints.new(a => 1);
@@ -88,7 +88,7 @@ subtest 'object-sorter' => {
     is $sorter($o1, $o3), Order::Same, '1 sorts same as 01, different objects';
 
 
-    my class MultiId does UR6::Object {
+    my class MultiId is UR6::Object {
         has Str $.str is id;
         has Int $.int is id;
     }
@@ -105,7 +105,7 @@ subtest 'caret methods' => {
     plan 12;
     use UR6::Object;
 
-    my class Thingy does UR6::Object {
+    my class Thingy is UR6::Object {
         has Int $.a is id;
     }
 
@@ -135,7 +135,7 @@ subtest 'id resolution' => {
     plan 6;
 
     use UR6::Object;
-    my class Thingy does UR6::Object {
+    my class Thingy is UR6::Object {
         has Int $.a is id;
         has Int $.b is id;
     }

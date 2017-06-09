@@ -6,7 +6,7 @@ use Test;
 
 plan 4;
 
-class Foo does UR6::Object {
+class Foo is UR6::Object {
     has Int $.param1;
     has Str $.param2;
 }
@@ -83,7 +83,7 @@ subtest 'get with simple filters' => {
 subtest 'id attributes' => {
     plan 14;
 
-    my class SingleId does UR6::Object {
+    my class SingleId is UR6::Object {
         has $.a is id;
     }
 
@@ -102,7 +102,7 @@ subtest 'id attributes' => {
         Exception, message => /'Cannot provide both __id and explicit ID'/;
 
 
-    my class MultiId does UR6::Object {
+    my class MultiId is UR6::Object {
         has $.a is id;
         has $.b is id;
     }

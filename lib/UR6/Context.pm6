@@ -2,8 +2,6 @@ use UR6::ObjectCache;
 
 unit class UR6::Context;
 
-role UR6::Object { ... };
-
 has UR6::ObjectCache $.object-cache = UR6::ObjectCache.new();
 has UR6::Context $.parent;
 
@@ -16,7 +14,7 @@ method current() returns UR6::Context { $current-context }
 
 method fetch(Any:U, Hash --> Iterable) { ... }
 method store(Array) { ... }
-method create-entity(Any:U, Hash --> UR6::Object) { ... }
+method create-entity(Any:U, Hash) { ... }
 method delete-entity(Any) { ... }
 
 method branch(UR6::Context:U: UR6::Context:U $kind) {

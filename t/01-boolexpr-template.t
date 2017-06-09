@@ -7,7 +7,7 @@ use Test;
 
 plan 4;
 
-class Foo does UR6::Object {
+class Foo is UR6::Object {
     has Int $.param1 is id;
     has Str $.param2;
 }

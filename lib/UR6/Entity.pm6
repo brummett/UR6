@@ -1,7 +1,8 @@
 use UR6 :class-traits, :attribute-traits;
 need UR6::Object;
 
-role UR6::Entity does UR6::Object { }
+#role UR6::Entity does UR6::Object { }
+role UR6::Entity { }
 
 class UR6::Entity::ClassHOW
     is UR6::Object::ClassHOW

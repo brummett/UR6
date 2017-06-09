@@ -66,6 +66,8 @@ multi sub trait_mod:<is>(Method $meth, Bool :$memoized!) is export {
     });
 }
 
+sub current-context(--> UR6::Context) is export(:context) { UR6::Context.current }
+
 initialize();
 
 sub initialize() {

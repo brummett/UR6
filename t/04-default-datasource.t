@@ -8,6 +8,7 @@ plan 1;
 
 my %load-args;
 class NamedThing
+    is UR6::Object
     does UR6::Entity
     is data-source(UR6::DataSource::Default)
 {
