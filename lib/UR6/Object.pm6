@@ -1,8 +1,8 @@
-use UR6 :attribute-traits, :context;
+use UR6 :attribute-traits, :context, :DEFAULT;
 use UR6::BoolExpr;
 
 class UR6::Object {
-    has $.__id;
+    has $.__id is id;
 
     method create(Any:U: *%args --> UR6::Object) {
         my %normalized-args = self.normalize-id-attributes-for-create(%args);
@@ -12,7 +12,7 @@ class UR6::Object {
     method normalize-id-attributes-for-create(%args --> Hash) {
         my $type-obj = self.HOW;
 
-        my @id-attrib-names = $type-obj.get-attribute-names(:id, :explicit);
+        my @id-attrib-names = $type-obj.get-attribute-names(:id);
         if %args<__id> and any(%args{@id-attrib-names}:exists) {
             die "Cannot provide both __id and explicit ID attributes to create()";
 
@@ -52,14 +52,15 @@ class UR6::Object::ClassHOW
     has $.id-value-separator = "\0";
     has %.__cache;
 
-    # allows calling via TypeName.^attributes()
+    # allows calling via TypeName.^get-attributes()
     # I'd rather this were an override of Metamodel::ClassHOW's attributes(), but creating a class
     # fails with something about iterating a P6Opaque
-    multi method get-attributes(Mu $class, Bool :$explicit=False, Bool :$id=False, *%params --> Iterable) {
+    multi method get-attributes(Mu $class, Bool :$explicit=True, Bool :$id=False, *%params --> Iterable) {
+
         if $id {
-            my @id-attribs = self.attributes(self).grep({ $_ ~~ IsIdAttribute});
-            unless $explicit or @id-attribs.elems {
-                @id-attribs = self.attributes(self).grep({ .name eq '$!__id'});
+            my @id-attribs = self.attributes(self).grep({ say "checking attr ",$_," IsIdIattribute: ",$_ ~~ IsIdAttribute; $_ ~~ IsIdAttribute });
+            if $explicit {
+                @id-attribs = self.attributes(self).grep({ say "checking attr ",$_," IsExplicitIdAttribute: ", $_ ~~ IsExplicitIdAttribute; $_ ~~ IsExplicitIdAttribute });
             }
             return @id-attribs;
         }
@@ -106,6 +107,7 @@ class UR6::Object::ClassHOW
     # Returns a closure that can be called for any object
     multi method composite-id-resolver(--> Callable) {
         my @id-attrib-names = self.get-attribute-names(:id);
+        @id-attrib-names = <__id> unless @id-attrib-names.elems;
         my multi sub resolver (UR6::Object $obj --> Str) {
             @id-attrib-names.map({ $obj."$_"() }).join($!id-value-separator);
         }
@@ -134,7 +136,7 @@ class UR6::Object::ClassHOW
     }
 
     multi method composite-id-decomposer(Cool $id --> Iterable) {
-        $id.split( $!id-value-separator, self.get-attributes(:id, :explicit).elems);
+        $id.split( $!id-value-separator, self.get-attributes(:id).elems);
     }
     multi method composite-id-decomposer(UR6::Object:U $class, Cool $id) {
         samewith($id);

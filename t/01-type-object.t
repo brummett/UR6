@@ -18,12 +18,12 @@ subtest 'implied ID attribute' => {
     is @attribs.elems, 2, 'has 2 attributes';
     is-deeply @attribs>>.name, ['$!a', '$!__id'], 'attribute names';
 
-    my @id-attribs = $class-obj.get-attributes(:id);
+    my @id-attribs = $class-obj.get-attributes(:id, :!explicit);
     is @id-attribs.elems, 1, 'has 1 ID attribute';
     is @id-attribs[0].name, '$!__id', 'is the implied $!__id attribute';
 
-    is $class-obj.get-attributes(:id, :explicit).elems, 0, 'Class has no explicit ID attributes';
-    is $class-obj.get-attribute-names(:id, :explicit).elems, 0, 'Class has no explicit ID attribute names';
+    is $class-obj.get-attributes(:id).elems, 0, 'Class has no explicit ID attributes';
+    is $class-obj.get-attribute-names(:id).elems, 0, 'Class has no explicit ID attribute names';
 }
 
 subtest 'explicit ID attributes' => {
@@ -36,7 +36,7 @@ subtest 'explicit ID attributes' => {
     }
 
     my @id-attribs = HasId.HOW.get-attributes(:id);
-    is @id-attribs.elems, 1, 'HasId ID attribute';
+    is @id-attribs.elems, 1, 'HasId explicit ID attribute';
     is @id-attribs[0].name, '$!a', 'ID attrib name';
 
     my class HasIdChild is HasId {

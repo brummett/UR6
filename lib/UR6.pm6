@@ -9,6 +9,10 @@ multi sub trait_mod:<is>(Attribute $attr, :$id!) is export {
     $attr does IsIdAttribute;
 }
 
+subset IsExplicitIdAttribute of Attribute
+    is export(:attribute-traits)
+    where { $_ ~~ IsIdAttribute and .name ne '$!__id' };
+
 my role HasColumn[Str $column!] is export(:attribute-traits) {
     method column-name { $column }
 }
