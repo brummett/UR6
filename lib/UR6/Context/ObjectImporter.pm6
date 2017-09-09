@@ -6,8 +6,6 @@ use UR6::DataSource::ResultSet;
 # Like UR::Context::ImportIterator
 unit class UR6::Context::ObjectImporter does Iterator;
 
-#role UR6::Entity { ... }
-
 has UR6::Context::ObjectFabricator @!object-fabricators;
 has UR6::DataSource::QueryPlan     $!query-plan;
 has Iterator                       $!resultset;

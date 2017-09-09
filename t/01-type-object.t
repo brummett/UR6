@@ -73,7 +73,6 @@ subtest 'object-sorter' => {
     is $sorter($o1, $o1), Order::Same, 'a sorts same as a';
     is $sorter($o1, $o3), Order::Same, 'a sorts same as a, different objects';
 
-
     my class Ints is UR6::Object {
         has Int $.a is id;
     }
